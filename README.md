@@ -78,18 +78,25 @@ fallback, so the full flow can be demoed with zero setup cost.
 - DELETE /api/candidates/{id} - remove a candidate
 - GET /api/health - health check, reports whether LLM mode is active
 
-## Project structureresume_screener/
+## Project structure
+
+resume_screener/
 ├── backend/
-│ ├── main.py FastAPI app and routes
-│ ├── database.py SQLAlchemy models and session
-│ ├── resume_parser.py PDF/text extraction
-│ ├── llm_service.py LLM prompts, extraction and scoring logic
+│ ├── main.py (FastAPI app and routes)
+│ ├── database.py (SQLAlchemy models and session)
+│ ├── resume_parser.py (PDF/text extraction)
+│ ├── llm_service.py (LLM prompts, extraction and scoring logic)
 │ ├── requirements.txt
 │ └── .env.example
 ├── frontend/
-│ └── index.html Dashboard
+│ └── index.html (Dashboard)
 ├── sample_data/
 │ ├── sample_resume.txt
 │ └── sample_job_description.txt
 └── README.md
 
+Make sure there's a blank line right before the first ``` and right after the last ``` — that blank line is what tells GitHub "this is a code block, preserve the formatting."
+
+Step 3 — Commit the change
+
+Scroll down, you'll see "
