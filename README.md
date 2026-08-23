@@ -95,3 +95,8 @@ resume_screener/
 │ └── sample_job_description.txt
 └── README.md
 
+## Demo
+https://drive.google.com/file/d/1TSqjN5blt-XHiuxNdXJGYpz68NslCnTP/view?usp=sharing
+
+## Hosted URL
+http://127.0.0.1:8000/
