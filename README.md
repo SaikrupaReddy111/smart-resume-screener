@@ -95,8 +95,3 @@ resume_screener/
 │ └── sample_job_description.txt
 └── README.md
 
-Make sure there's a blank line right before the first ``` and right after the last ``` — that blank line is what tells GitHub "this is a code block, preserve the formatting."
-
-Step 3 — Commit the change
-
-Scroll down, you'll see "
