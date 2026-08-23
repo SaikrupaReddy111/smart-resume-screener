@@ -1,0 +1,6 @@
+﻿Job Title: Backend Engineer
+
+We are looking for a Backend Engineer with strong Python experience, ideally with
+FastAPI or a similar framework. You'll design and maintain REST APIs, work with
+PostgreSQL, and collaborate with a small cross-functional team. Experience with
+Docker and AWS is a strong plus. 2+ years of professional experience preferred.

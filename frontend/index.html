@@ -1,0 +1,364 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart Resume Screener</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #131a23;
+    --line: #223041;
+    --text: #d8e2ec;
+    --muted: #7c8ba1;
+    --accent: #4dd6a0;
+    --accent-dim: #2a5a48;
+    --warn: #e8b34d;
+    --mono: "IBM Plex Mono", "SF Mono", Consolas, monospace;
+    --sans: "IBM Plex Sans", -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  header {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    background: rgba(13,17,23,0.85);
+    backdrop-filter: blur(4px);
+  }
+  header h1 {
+    font-family: var(--mono);
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+  header h1 span { color: var(--accent); }
+  #status {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 28px;
+  }
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 22px;
+  }
+  .panel h2 {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 18px;
+  }
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 14px 0 6px;
+  }
+  input[type=text], textarea {
+    width: 100%;
+    background: #0a0f16;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--text);
+    padding: 10px 12px;
+    font-family: var(--sans);
+    font-size: 14px;
+    resize: vertical;
+  }
+  textarea { min-height: 110px; }
+  input[type=file] {
+    width: 100%;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    background: var(--accent);
+    color: #06140f;
+    border: none;
+    border-radius: 3px;
+    padding: 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  button:hover { opacity: 0.88; }
+  button:disabled { background: var(--line); color: var(--muted); cursor: wait; }
+
+  #error-box {
+    display: none;
+    margin-top: 14px;
+    padding: 10px 12px;
+    border: 1px solid #6a2c2c;
+    background: #241313;
+    color: #f5a3a3;
+    font-size: 13px;
+    border-radius: 3px;
+    font-family: var(--mono);
+  }
+
+  .candidate {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    background: #0f151d;
+    position: relative;
+  }
+  .candidate-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .candidate-name {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .candidate-file {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .score-badge {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 3px;
+    min-width: 52px;
+    text-align: center;
+  }
+  .score-high { background: var(--accent-dim); color: var(--accent); }
+  .score-mid  { background: #3a3220; color: var(--warn); }
+  .score-low  { background: #2c1616; color: #e07a7a; }
+
+  .skills {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .skill-chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--muted);
+  }
+  .justification {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .justification-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .empty-state {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    padding: 40px 0;
+  }
+  .del-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    width: auto;
+    margin: 0;
+    padding: 0 4px;
+    line-height: 1;
+  }
+  .del-btn:hover { color: #e07a7a; opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Smart Resume <span>Screener</span></h1>
+  <div id="status">checking backend…</div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Submit a candidate</h2>
+    <form id="screen-form">
+      <label for="name">Candidate name</label>
+      <input type="text" id="name" required placeholder="e.g. Priya Sharma" />
+
+      <label for="resume">Resume file (PDF or .txt)</label>
+      <input type="file" id="resume" accept=".pdf,.txt" required />
+
+      <label for="jd">Job description</label>
+      <textarea id="jd" required placeholder="Paste the job description here..."></textarea>
+
+      <button type="submit" id="submit-btn">Screen resume</button>
+      <div id="error-box"></div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Shortlist <span id="count" style="color:var(--muted)"></span></h2>
+    <div id="candidates-list">
+      <div class="empty-state">No candidates screened yet.</div>
+    </div>
+  </section>
+</main>
+
+<script>
+const API = "/api";
+
+async function checkHealth() {
+  try {
+    const res = await fetch(`${API}/health`);
+    const data = await res.json();
+    document.getElementById("status").textContent =
+      data.llm_enabled ? "● LLM scoring active" : "● heuristic mode (no GEMINI_API_KEY set)";
+  } catch (e) {
+    document.getElementById("status").textContent = "● backend unreachable";
+  }
+}
+
+function scoreClass(score) {
+  if (score >= 7) return "score-high";
+  if (score >= 4) return "score-mid";
+  return "score-low";
+}
+
+function renderCandidates(list) {
+  const container = document.getElementById("candidates-list");
+  document.getElementById("count").textContent = list.length ? `(${list.length})` : "";
+
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-state">No candidates screened yet.</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(c => `
+    <div class="candidate" data-id="${c.id}">
+      <div class="candidate-top">
+        <div>
+          <div class="candidate-name">${escapeHtml(c.name)}</div>
+          <div class="candidate-file">${escapeHtml(c.resume_filename)}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="score-badge ${scoreClass(c.match_score)}">${c.match_score.toFixed(1)}</div>
+          <button class="del-btn" title="Remove" onclick="deleteCandidate(${c.id})">✕</button>
+        </div>
+      </div>
+      <div class="skills">
+        ${c.skills.map(s => `<span class="skill-chip">${escapeHtml(s)}</span>`).join("")}
+      </div>
+      <div class="justification">
+        <div class="justification-label">LLM justification</div>
+        ${escapeHtml(c.justification)}
+      </div>
+    </div>
+  `).join("");
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML;
+}
+
+async function loadCandidates() {
+  const res = await fetch(`${API}/candidates`);
+  const data = await res.json();
+  renderCandidates(data);
+}
+
+async function deleteCandidate(id) {
+  await fetch(`${API}/candidates/${id}`, { method: "DELETE" });
+  loadCandidates();
+}
+
+document.getElementById("screen-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("submit-btn");
+  const errBox = document.getElementById("error-box");
+  errBox.style.display = "none";
+
+  const name = document.getElementById("name").value;
+  const jd = document.getElementById("jd").value;
+  const fileInput = document.getElementById("resume");
+
+  if (!fileInput.files.length) return;
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("job_description", jd);
+  formData.append("resume", fileInput.files[0]);
+
+  btn.disabled = true;
+  btn.textContent = "Screening…";
+
+  try {
+    const res = await fetch(`${API}/screen`, { method: "POST", body: formData });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || "Screening failed");
+    }
+    e.target.reset();
+    await loadCandidates();
+  } catch (err) {
+    errBox.textContent = err.message;
+    errBox.style.display = "block";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Screen resume";
+  }
+});
+
+checkHealth();
+loadCandidates();
+</script>
+</body>
+</html>
